@@ -1,0 +1,94 @@
+% Fonty 
+\input cavantga.tex
+\font \icon = FontAwesome--fontawesomeone at 9pt
+\font \icont = FontAwesome--fontawesometwo at 9pt
+
+% Nastavení stránky
+\hoffset\dimexpr20mm-1in
+\voffset\dimexpr11mm-1in
+\hsize171mm
+\vsize271mm
+\parindent0mm
+\footline={}
+
+% Deklarace proměnné pro smyčku a deklarace toksů pro ukládání informace k vizitkám
+\newcount\X
+\newtoks\predegree
+\newtoks\postdegree
+\newtoks\fullname
+\newtoks\workactivity
+\newtoks\email
+\newtoks\phoneno
+\newtoks\website
+\newtoks\company
+\newtoks\street
+\newtoks\city
+\newtoks\logo
+\newtoks\logoheight
+\newtoks\stripecolor
+
+% Definice barev
+\def\White{\pdfliteral{1 g}}        		     % bíla barva
+\def\Black{\pdfliteral{0 g}}         		     % černá barva
+\def\Blue{\pdfliteral{0 0.48 0.76 rg}} 	     % ČVUT modrá
+
+% Definice ikonek pro telefon, adresu, email a webovou stránku
+\def\phone{{\icont \char 185 }}
+\def\house{{\icont \char 127 }}
+\def\envelope{{\icont \char 56 }}
+\def\cursor{{\icon \char 155 }}
+
+% Nastavení velikosti písma
+\def\size #1 {\def\sizespec{at#1pt}\resizeall \tenrm}
+
+% Vykreslí text daný barvou parametru 5 a obsahem parametru 1 v boxu vysokém daným parametrem 3 a širokém daném parametrem 2 s barevným pozadím v barvě parametru 4
+\def\item #1 #2 #3 #4 #5 {\hbox{\hbox to 0pt{#4\vrule height\dimexpr#3-1mm\relax width#2 depth1mm\hss}\hbox to #2{\hss{#5 #1}\hss}}}
+
+% Definuje vytisknuté jméno
+\def\name #1{\setbox0=\hbox{\if:\the\predegree:\else\size {\numexpr#1-4\relax} \the\predegree\ \fi\size #1 \the\fullname\if&\the\postdegree&\else\size {\numexpr#1-4\relax} ,\ \the\postdegree\fi}\ifdim\wd0<75mm\box0\else\name{\numexpr#1-1\relax}\fi
+}
+
+% Definuje vytisknutou pozici nebo oddělení
+\def\position #1{\setbox0=\hbox{\size #1 \the\workactivity}\ifdim\wd0<75mm\box0\else\position{\numexpr#1-1\relax}\fi}
+
+% Vytiskne informace o firmě, telefonu, emailu a webové stránce ve velikosti dané parametrem 1
+\def\printinfo #1 {\vbox{\item {\size #1 \kern5mm\hbox to 4mm{\hss\envelope\kern1mm\hss}\the\email\hfill\the\company\hbox to 4mm{\hss\kern1mm\house\hss}\kern5mm} 85mm 5mm {\White} {\Black} \item {\size #1 \kern5mm\hbox to 4mm{\hss\phone\kern1mm\hss}\the\phoneno\hfill\the\street\hbox to 4mm{\hfill}\kern5mm} 85mm 5mm {\White} {\Black} \item {\size #1 \kern5mm\hbox to 4mm{\hss\cursor\kern1mm\hss}\the\website\hfill\the\city\hbox to 4mm{\hfill}\kern5mm} 85mm 5mm {\White} {\Black} }}
+
+% Definuje vytisknuté informace o firmě, telefonu, emailu a webové stránce ve velikosti dané parametrem 1
+\def\info #1 {\setbox0=\vbox{\hbox{\size #1 \the\email\hfill\the\company}\hbox {\size #1 \the\phoneno\hfill\the\street}\hbox {\size #1 \the\website\hfill\the\city}}\ifdim\wd0<60mm \printinfo #1 \else\info {\numexpr#1-1\relax} \fi}
+
+% Definuje vzhled přední strany vizitky
+\def\front{\hbox{\vrule\vbox{\hrule
+\offinterlineskip
+\item {} 85mm 5mm {\the\stripecolor} {\the\stripecolor} 
+\vbox to 25mm{\vfill
+\item \name{14} 85mm 5mm {\White} {\Black} 
+\item \position{8} 85mm 5mm {\White} {\Black}
+\vfill}
+\info{8}
+\item {} 85mm 5mm {\White} {\White}
+\item {} 85mm 5mm {\the\stripecolor} {\the\stripecolor}
+\hrule}\vrule}}
+
+% Definuje vzhled zadní strany vizitky
+\def\back{\hbox{\vrule\vbox to 55mm{\hrule\vss\hbox to 85mm{\hss\pdfrefximage\logopic\hss}\vss\hrule}\vrule}}
+
+% Definuje, jak budou vizitky vytisknuté
+\def\printcard{
+	\X=5
+	\loop
+	\hbox{\front\kern-0.4pt\front}\nointerlineskip\kern-0.4pt
+	\advance \X by -1
+	\unless\ifnum \X<1
+	\repeat
+	\break
+	\pdfximage height\the\logoheight {\the\logo}
+	\mathchardef\logopic=\pdflastximage
+	\X=5
+	\loop
+	\hbox{\back\kern-0.4pt\back}\nointerlineskip\kern-0.4pt
+	\advance \X by -1
+	\unless\ifnum \X<1
+	\repeat
+	\break}	
+	
